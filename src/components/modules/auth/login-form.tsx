@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 'use client';
 import { Button } from "@/components/ui/button";
 import {
@@ -14,6 +15,13 @@ import { useActionState } from "react";
 const LoginForm = () => {
     const [state, formAction, isPending] = useActionState(loginUser, null);
 
+    const getFieldError = (fieldName: string) => {
+        if (state && !state.success) {
+            const fieldError = state.error.find((err: any) => err.field === fieldName);
+            return fieldError ? fieldError.message : null;
+        };
+    };
+
     return (
         <form action={formAction}>
             <FieldGroup>
@@ -28,8 +36,14 @@ const LoginForm = () => {
                             name="email"
                             type="email"
                             placeholder="evil@gmail.com"
-                            required
                         />
+                        {
+                            getFieldError("email") && (
+                                <FieldDescription className="text-red-600">
+                                    {getFieldError("email")}
+                                </FieldDescription>
+                            )
+                        }
                     </Field>
                     {/* Password */}
                     <Field>
@@ -41,8 +55,14 @@ const LoginForm = () => {
                             name="password"
                             type="password"
                             placeholder="********"
-                            required
                         />
+                        {
+                            getFieldError("password") && (
+                                <FieldDescription className="text-red-600">
+                                    {getFieldError("password")}
+                                </FieldDescription>
+                            )
+                        }
                     </Field>
                 </div>
                 <FieldGroup>
