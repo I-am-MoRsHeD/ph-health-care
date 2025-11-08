@@ -1,5 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 "use server";
+import { parse } from "cookie";
+import { cookies } from "next/headers";
 import z from "zod";
 
 
@@ -18,6 +20,8 @@ const loginValidateZodSchema = z.object({
 
 export const loginUser = async (_currentState: any, formData: any): Promise<any> => {
     try {
+        let accessTokenObject: null | any = null;
+        let refreshTokenObject: null | any = null;
         const loginData = {
             email: formData.get('email'),
             password: formData.get("password"),
@@ -35,7 +39,7 @@ export const loginUser = async (_currentState: any, formData: any): Promise<any>
                     }
                 })
             }
-        }
+        };
 
         const res = await fetch("http://localhost:5000/api/auth/login", {
             method: "POST",
@@ -43,9 +47,48 @@ export const loginUser = async (_currentState: any, formData: any): Promise<any>
             headers: {
                 "Content-type": "application/json"
             }
-        }).then(res => res.json());
+        });
 
-        return res;
+        const result = await res.json();
+        const setCookiesHeaders = res.headers.getSetCookie();
+
+        if (setCookiesHeaders && setCookiesHeaders.length > 0) {
+            setCookiesHeaders.forEach((cookie) => {
+                const parsedCookie = parse(cookie);
+                
+                if (parsedCookie['accessToken']) {
+                    accessTokenObject = parsedCookie;
+                };
+                if (parsedCookie['refreshToken']) {
+                    refreshTokenObject = parsedCookie;
+                };
+            })
+        } else {
+            throw new Error("No set-cookie headers found");
+        };
+
+        if (!accessTokenObject && !refreshTokenObject) {
+            throw new Error("Tokens are missing in cookies");
+        };
+
+        const cookieStore = await cookies();
+        cookieStore.set('accessToken', accessTokenObject.accessToken, {
+            secure: true,
+            httpOnly: true,
+            maxAge: parseInt(accessTokenObject["Max-Age"]) || 1000 * 60 * 60,
+            path: accessTokenObject.Path,
+            sameSite: accessTokenObject.SameSite || "none"
+        });
+        cookieStore.set('refreshToken', refreshTokenObject.refreshToken, {
+            secure: true,
+            httpOnly: true,
+            maxAge: parseInt(refreshTokenObject["Max-Age"]) || 1000 * 60 * 60 * 24 * 90,
+            path: refreshTokenObject.Path,
+            sameSite: refreshTokenObject.SameSite || "none"
+        });
+
+
+        return result;
 
     } catch (error) {
         console.log(error);
