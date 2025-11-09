@@ -12,7 +12,7 @@ import { loginUser } from "@/services/auth/loginUser";
 import Link from "next/link";
 import { useActionState } from "react";
 
-const LoginForm = () => {
+const LoginForm = ({ callbackUrl }: { callbackUrl: string | undefined }) => {
     const [state, formAction, isPending] = useActionState(loginUser, null);
 
     const getFieldError = (fieldName: string) => {
@@ -24,6 +24,8 @@ const LoginForm = () => {
 
     return (
         <form action={formAction}>
+            {/* callbackUrl input */}
+            {callbackUrl && <input type="hidden" name="callbackUrl" value={callbackUrl} />}
             <FieldGroup>
                 <div className="grid grid-cols-1 gap-4">
                     {/* email */}

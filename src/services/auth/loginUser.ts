@@ -1,7 +1,10 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 "use server";
+import { getDefaultDashboardRoute, isValidRedirectForRole, UserRole } from "@/lib/auth-utils";
 import { parse } from "cookie";
+import jwt, { JwtPayload } from "jsonwebtoken";
 import { cookies } from "next/headers";
+import { redirect } from "next/navigation";
 import z from "zod";
 
 
@@ -20,6 +23,7 @@ const loginValidateZodSchema = z.object({
 
 export const loginUser = async (_currentState: any, formData: any): Promise<any> => {
     try {
+        const callbackUrl = formData.get("callbackUrl") || null;
         let accessTokenObject: null | any = null;
         let refreshTokenObject: null | any = null;
         const loginData = {
@@ -49,13 +53,13 @@ export const loginUser = async (_currentState: any, formData: any): Promise<any>
             }
         });
 
-        const result = await res.json();
+        await res.json();
         const setCookiesHeaders = res.headers.getSetCookie();
 
         if (setCookiesHeaders && setCookiesHeaders.length > 0) {
             setCookiesHeaders.forEach((cookie) => {
                 const parsedCookie = parse(cookie);
-                
+
                 if (parsedCookie['accessToken']) {
                     accessTokenObject = parsedCookie;
                 };
@@ -87,10 +91,27 @@ export const loginUser = async (_currentState: any, formData: any): Promise<any>
             sameSite: refreshTokenObject.SameSite || "none"
         });
 
+        const verifiedUser: JwtPayload | string = jwt.verify(accessTokenObject.accessToken, process.env.JWT_ACCESS_SECRET as string);
+        console.log("Varified user in login action function", verifiedUser);
+        if (verifiedUser && typeof verifiedUser === "string") {
+            throw new Error("Invalid token payload");
+        };
 
-        return result;
+        const userRole: UserRole = (verifiedUser as JwtPayload).role as UserRole;
 
-    } catch (error) {
+        if (callbackUrl) {
+            if (isValidRedirectForRole(callbackUrl.toString(), userRole)) {
+                redirect(callbackUrl.toString());
+            } else {
+                redirect(getDefaultDashboardRoute(userRole));
+            }
+        }
+
+
+    } catch (error: any) {
+        if (error?.digest?.startsWith("NEXT_REDIRECT")) {
+            throw error;
+        }
         console.log(error);
         return { error: "Login failed!" }
     }
