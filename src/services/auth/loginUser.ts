@@ -53,7 +53,8 @@ export const loginUser = async (_currentState: any, formData: any): Promise<any>
             }
         });
 
-        await res.json();
+        const result = await res.json();
+
         const setCookiesHeaders = res.headers.getSetCookie();
 
         if (setCookiesHeaders && setCookiesHeaders.length > 0) {
@@ -97,6 +98,10 @@ export const loginUser = async (_currentState: any, formData: any): Promise<any>
             throw new Error("Invalid token payload");
         };
 
+        if (!result.success) {
+            throw new Error(result.message || "Login failed");
+        }
+
         const userRole: UserRole = (verifiedUser as JwtPayload).role as UserRole;
 
         if (callbackUrl) {
@@ -105,6 +110,8 @@ export const loginUser = async (_currentState: any, formData: any): Promise<any>
             } else {
                 redirect(getDefaultDashboardRoute(userRole));
             }
+        } else {
+            redirect(getDefaultDashboardRoute(userRole));
         }
 
 

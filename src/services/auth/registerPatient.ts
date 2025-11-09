@@ -1,6 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 'use server';
 import z from "zod";
+import { loginUser } from "./loginUser";
 
 
 const registerValidateZodSchema = z.object({
@@ -49,7 +50,7 @@ export const registerPatient = async (_currentState: any, formData: any): Promis
             contactNumber: formData.get('contact-number'),
             confirmPassword: formData.get("confirm-password"),
         });
-        console.log(validateFields);
+
 
         if (!validateFields.success) {
             return {
@@ -67,14 +68,23 @@ export const registerPatient = async (_currentState: any, formData: any): Promis
 
         newFormData.append('data', JSON.stringify(registerData));
 
-        // const res = await fetch("http://localhost:5000/api/user/create-patient", {
-        //     method: "POST",
-        //     body: newFormData
-        // }).then(res => res.json());
+        const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/user/create-patient`, {
+            method: "POST",
+            body: newFormData
+        });
 
-        // return res;
+        const result = await res.json();
 
-    } catch (error) {
+        if (result.success) {
+            await loginUser(_currentState, formData);
+        }
+
+        return result;
+
+    } catch (error: any) {
+        if (error?.digest?.startsWith("NEXT_REDIRECT")) {
+            throw error;
+        }
         console.log(error);
         return { error: "Registration failed!" }
     }
