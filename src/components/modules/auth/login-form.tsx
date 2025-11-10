@@ -10,17 +10,27 @@ import {
 import { Input } from "@/components/ui/input"
 import { loginUser } from "@/services/auth/loginUser";
 import Link from "next/link";
-import { useActionState } from "react";
+import { useActionState, useEffect } from "react";
+import { toast } from "sonner";
 
-const LoginForm = ({ callbackUrl }: { callbackUrl: string | undefined }) => {
+const LoginForm = ({ callbackUrl }: { callbackUrl?: string | undefined }) => {
     const [state, formAction, isPending] = useActionState(loginUser, null);
-
+    console.log("Login form state:", state);
     const getFieldError = (fieldName: string) => {
-        if (state && !state.success) {
-            const fieldError = state.error.find((err: any) => err.field === fieldName);
+        if (state && !state?.success) {
+            const fieldError = state?.error?.find((err: any) => err?.field === fieldName);
             return fieldError ? fieldError.message : null;
         };
     };
+
+    useEffect(() => {
+        if (state && state?.success) {
+            toast.success(state?.message || "Logged in successfully!");
+        }
+        else if (state && !state?.success) {
+            toast.error(state?.message || "Login failed. Please try again.");
+        }
+    }, [state]);
 
     return (
         <form action={formAction}>

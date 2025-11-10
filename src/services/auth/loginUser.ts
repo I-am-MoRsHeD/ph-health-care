@@ -105,12 +105,12 @@ export const loginUser = async (_currentState: any, formData: any): Promise<any>
 
         if (callbackUrl) {
             if (isValidRedirectForRole(callbackUrl.toString(), userRole)) {
-                redirect(callbackUrl.toString());
+                redirect(`${callbackUrl.toString()}?loggedIn=true`);
             } else {
-                redirect(getDefaultDashboardRoute(userRole));
+                redirect(`${getDefaultDashboardRoute(userRole)}?loggedIn=true`);
             }
         } else {
-            redirect(getDefaultDashboardRoute(userRole));
+            redirect(`${getDefaultDashboardRoute(userRole)}?loggedIn=true`);
         }
 
 
@@ -119,7 +119,10 @@ export const loginUser = async (_currentState: any, formData: any): Promise<any>
             throw error;
         }
         console.log(error);
-        return { error: "Login failed!" }
+        return {
+            success: false,
+            message: error.message || "Login failed! Wrong credentials."
+        }
     }
 };
 
