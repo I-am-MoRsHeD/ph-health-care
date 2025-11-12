@@ -3,7 +3,7 @@ import { Button } from "../ui/button";
 import { Sheet, SheetContent, SheetTitle, SheetTrigger } from "../ui/sheet";
 import { Menu } from "lucide-react";
 import { getCookie } from "@/lib/tokenHandlers";
-import LogoutUser from "./LogoutUser";
+import LogoutButton from "./LogoutButton";
 
 const PublicNavbar = async () => {
   const accessToken = await getCookie("accessToken");
@@ -37,7 +37,7 @@ const PublicNavbar = async () => {
         <div className="hidden md:flex items-center space-x-2">
           {
             accessToken ? (
-              <LogoutUser />
+              <LogoutButton />
             ) : (
               <Link href="/login" className="text-lg font-medium">
                 <Button>Login</Button>
@@ -71,7 +71,7 @@ const PublicNavbar = async () => {
                   <div className="flex justify-center"></div>
                   {
                     accessToken ? (
-                      <LogoutUser />
+                      <LogoutButton />
                     ) : (
                       <Link href="/login" className="text-lg font-medium">
                         <Button>Login</Button>
