@@ -2,7 +2,7 @@ import Link from "next/link";
 import { Button } from "../ui/button";
 import { Sheet, SheetContent, SheetTitle, SheetTrigger } from "../ui/sheet";
 import { Menu } from "lucide-react";
-import { getCookie } from "@/lib/tokenHandlers";
+import { getCookie } from "@/services/auth/tokenHandlers";
 import LogoutButton from "./LogoutButton";
 
 const PublicNavbar = async () => {

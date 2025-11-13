@@ -1,6 +1,6 @@
 "use server";
 
-import { deleteCookie } from "@/lib/tokenHandlers";
+import { deleteCookie } from "@/services/auth/tokenHandlers";
 import { redirect } from "next/navigation";
 
 

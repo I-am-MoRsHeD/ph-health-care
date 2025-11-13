@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 'use server';
 
-import { getCookie } from "@/lib/tokenHandlers";
+import { getCookie } from "@/services/auth/tokenHandlers";
 import { IUser } from "@/types/user.interface";
 import jwt, { JwtPayload } from "jsonwebtoken";
 
