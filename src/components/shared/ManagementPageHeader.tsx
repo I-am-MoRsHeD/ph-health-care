@@ -1,3 +1,4 @@
+'use client';
 import React from "react";
 import { LucideIcon, Plus } from "lucide-react";
 import { Button } from "../ui/button";

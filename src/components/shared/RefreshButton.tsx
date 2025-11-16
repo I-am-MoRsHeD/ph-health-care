@@ -1,3 +1,4 @@
+'use client';
 import { RefreshCcw } from "lucide-react";
 import { Button } from "../ui/button";
 import { useTransition } from "react";
