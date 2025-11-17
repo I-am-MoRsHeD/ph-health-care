@@ -4,24 +4,11 @@ import { getDefaultDashboardRoute, isValidRedirectForRole, UserRole } from "@/li
 import { serverFetch } from "@/lib/server-fetch";
 import { zodValidators } from "@/lib/zodValidators";
 import { setCookie } from "@/services/auth/tokenHandlers";
+import { loginValidateZodSchema } from "@/zod/auth.validation";
 import { parse } from "cookie";
 import jwt, { JwtPayload } from "jsonwebtoken";
 import { redirect } from "next/navigation";
-import z from "zod";
 
-
-const loginValidateZodSchema = z.object({
-    email: z.email({
-        error: "Email is required"
-    }),
-    password: z.string({
-        error: "Password is required"
-    }).min(6, {
-        message: "Password must be at least 6 characters long"
-    }).max(100, {
-        message: "Password must be at most 100 characters long"
-    })
-})
 
 export const loginUser = async (_currentState: any, formData: any): Promise<any> => {
     try {

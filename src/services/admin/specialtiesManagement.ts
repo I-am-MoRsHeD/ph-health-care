@@ -3,15 +3,8 @@
 
 import { serverFetch } from "@/lib/server-fetch";
 import { zodValidators } from "@/lib/zodValidators";
-import z from "zod";
+import { createSpecialityZodSchema } from "@/zod/speciality.validation";
 
-const createSpecialityZodSchema = z.object({
-    title: z.string({
-        error: "Title is required"
-    }).min(3, {
-        error: "Title must be at least 3 characters long"
-    })
-})
 
 export const createSpeciality = async (_prevState: any, formData: FormData) => {
     try {
