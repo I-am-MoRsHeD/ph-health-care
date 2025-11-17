@@ -1,6 +1,8 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 "use server";
 import { getDefaultDashboardRoute, isValidRedirectForRole, UserRole } from "@/lib/auth-utils";
+import { serverFetch } from "@/lib/server-fetch";
+import { zodValidators } from "@/lib/zodValidators";
 import { setCookie } from "@/services/auth/tokenHandlers";
 import { parse } from "cookie";
 import jwt, { JwtPayload } from "jsonwebtoken";
@@ -26,30 +28,22 @@ export const loginUser = async (_currentState: any, formData: any): Promise<any>
         const callbackUrl = formData.get("callbackUrl") || null;
         let accessTokenObject: null | any = null;
         let refreshTokenObject: null | any = null;
-        const loginData = {
+        const payload = {
             email: formData.get('email'),
             password: formData.get("password"),
         };
 
-        const validateFields = loginValidateZodSchema.safeParse(loginData);
+        if (zodValidators(payload, loginValidateZodSchema).success === false) {
+            return zodValidators(payload, loginValidateZodSchema);
+        }
 
-        if (!validateFields.success) {
-            return {
-                success: false,
-                error: validateFields.error.issues.map(issue => {
-                    return {
-                        field: issue.path[0],
-                        message: issue.message
-                    }
-                })
-            }
-        };
+        const validatedPayload = zodValidators(payload, loginValidateZodSchema).data;
 
-        const res = await fetch("http://localhost:5000/api/auth/login", {
-            method: "POST",
-            body: JSON.stringify(loginData),
+
+        const res = await serverFetch.post('/auth/login', {
+            body: JSON.stringify(validatedPayload),
             headers: {
-                "Content-type": "application/json"
+                'content-type': 'application/json'
             }
         });
 

@@ -2,6 +2,8 @@
 'use server';
 import z from "zod";
 import { loginUser } from "./loginUser";
+import { serverFetch } from "@/lib/server-fetch";
+import { zodValidators } from "@/lib/zodValidators";
 
 
 const registerValidateZodSchema = z.object({
@@ -34,7 +36,7 @@ const registerValidateZodSchema = z.object({
 
 export const registerPatient = async (_currentState: any, formData: any): Promise<any> => {
     try {
-        const registerData = {
+        const payload = {
             password: formData.get("password"),
             patient: {
                 name: formData.get('name'),
@@ -43,32 +45,32 @@ export const registerPatient = async (_currentState: any, formData: any): Promis
                 contactNumber: formData.get('contact-number')
             }
         };
-        const validateFields = registerValidateZodSchema.safeParse({
-            name: formData.get('name'),
-            email: formData.get('email'),
-            password: formData.get("password"),
-            contactNumber: formData.get('contact-number'),
-            confirmPassword: formData.get("confirm-password"),
-        });
 
-
-        if (!validateFields.success) {
-            return {
-                success: false,
-                error: validateFields.error.issues.map(issue => {
-                    return {
-                        field: issue.path[0],
-                        message: issue.message
-                    }
-                })
-            }
+        if (zodValidators(payload, registerValidateZodSchema).success === false) {
+            return zodValidators(payload, registerValidateZodSchema);
         }
+
+        const validatedPayload = zodValidators(payload, registerValidateZodSchema);
+
+        const registerData = {
+            password: validatedPayload?.data?.password,
+            patient: {
+                name: validatedPayload.data?.name,
+                address: validatedPayload?.data?.address,
+                email: validatedPayload?.data?.email,
+                contactNumber: validatedPayload?.data?.contactNumber
+            }
+        };
 
         const newFormData = new FormData(); // registerData ta amdr moto kore format korte  hoyeche,tai new formData kore arekta formData create korte hoyeche!
 
         newFormData.append('data', JSON.stringify(registerData));
 
-        const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/user/create-patient`, {
+        if (formData.get("file")) {
+            newFormData.append("file", formData.get("file") as Blob)
+        }
+
+        const res = await serverFetch.post(`/user/create-patient`, {
             method: "POST",
             body: newFormData
         });

@@ -1,5 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 'use client';
+import InputFieldError from "@/components/shared/InputFieldError";
 import { Button } from "@/components/ui/button";
 import {
     Field,
@@ -15,13 +16,7 @@ import { useActionState } from "react";
 
 const RegisterForm = () => {
     const [state, formAction, isPending] = useActionState(registerPatient, null);
-    console.log(state);
-    const getFieldError = (fieldName: string) => {
-        if (state && !state.success) {
-            const fieldError = state.error.find((err: any) => err.field === fieldName);
-            return fieldError ? fieldError.message : null;
-        };
-    };
+
 
     return (
         <form action={formAction}>
@@ -38,18 +33,12 @@ const RegisterForm = () => {
                             type="text"
                             placeholder="Evil Rabbit"
                         />
-                        {
-                            getFieldError("name") && (
-                                <FieldDescription className="text-red-600">
-                                    {getFieldError("name")}
-                                </FieldDescription>
-                            )
-                        }
+                        <InputFieldError field="name" state={state} />
                     </Field>
                     {/* address */}
                     <Field>
                         <FieldLabel htmlFor="address">
-                            Address
+                            Address(optional)
                         </FieldLabel>
                         <Input
                             id="address"
@@ -70,12 +59,7 @@ const RegisterForm = () => {
                             type="email"
                             placeholder="evil@gmail.com"
                         />
-                        {getFieldError("email") && (
-                            <FieldDescription className="text-red-600">
-                                {getFieldError("email")}
-                            </FieldDescription>
-                        )
-                        }
+                        <InputFieldError field="email" state={state} />
                     </Field>
                     {/* Contact Number */}
                     <Field>
@@ -88,12 +72,7 @@ const RegisterForm = () => {
                             type="text"
                             placeholder="01*********"
                         />
-                        {getFieldError("contactNumber") && (
-                            <FieldDescription className="text-red-600">
-                                {getFieldError("contactNumber")}
-                            </FieldDescription>
-                        )
-                        }
+                        <InputFieldError field="contact-number" state={state} />
                     </Field>
                     {/* Password */}
                     <Field>
@@ -106,12 +85,7 @@ const RegisterForm = () => {
                             type="password"
                             placeholder="********"
                         />
-                        {getFieldError("password") && (
-                            <FieldDescription className="text-red-600">
-                                {getFieldError("password")}
-                            </FieldDescription>
-                        )
-                        }
+                        <InputFieldError field="password" state={state} />
                     </Field>
                     {/* Confirm password */}
                     <Field>
@@ -124,12 +98,7 @@ const RegisterForm = () => {
                             type="password"
                             placeholder="********"
                         />
-                        {getFieldError("confirmPassword") && (
-                            <FieldDescription className="text-red-600">
-                                {getFieldError("confirmPassword")}
-                            </FieldDescription>
-                        )
-                        }
+                        <InputFieldError field="confirm-password" state={state} />
                     </Field>
                 </div>
                 <FieldGroup>

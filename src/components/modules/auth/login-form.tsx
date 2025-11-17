@@ -1,5 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 'use client';
+import InputFieldError from "@/components/shared/InputFieldError";
 import { Button } from "@/components/ui/button";
 import {
     Field,
@@ -15,13 +16,6 @@ import { toast } from "sonner";
 
 const LoginForm = ({ callbackUrl }: { callbackUrl?: string | undefined }) => {
     const [state, formAction, isPending] = useActionState(loginUser, null);
-    console.log("Login form state:", state);
-    const getFieldError = (fieldName: string) => {
-        if (state && !state?.success) {
-            const fieldError = state?.error?.find((err: any) => err?.field === fieldName);
-            return fieldError ? fieldError.message : null;
-        };
-    };
 
     useEffect(() => {
         if (state && state?.success) {
@@ -49,13 +43,7 @@ const LoginForm = ({ callbackUrl }: { callbackUrl?: string | undefined }) => {
                             type="email"
                             placeholder="evil@gmail.com"
                         />
-                        {
-                            getFieldError("email") && (
-                                <FieldDescription className="text-red-600">
-                                    {getFieldError("email")}
-                                </FieldDescription>
-                            )
-                        }
+                        <InputFieldError field="email" state={state} />
                     </Field>
                     {/* Password */}
                     <Field>
@@ -68,13 +56,7 @@ const LoginForm = ({ callbackUrl }: { callbackUrl?: string | undefined }) => {
                             type="password"
                             placeholder="********"
                         />
-                        {
-                            getFieldError("password") && (
-                                <FieldDescription className="text-red-600">
-                                    {getFieldError("password")}
-                                </FieldDescription>
-                            )
-                        }
+                        <InputFieldError field="password" state={state} />
                     </Field>
                 </div>
                 <FieldGroup>
