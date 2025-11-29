@@ -41,6 +41,30 @@ export const createSpeciality = async (_prevState: any, formData: FormData) => {
     }
 };
 
-export const getSpecialities = () => { };
+export async function getSpecialities() {
+    try {
+        const response = await serverFetch.get("/specialties")
+        const result = await response.json();
+        return result;
+    } catch (error: any) {
+        console.log(error);
+        return {
+            success: false,
+            message: `${process.env.NODE_ENV === 'development' ? error.message : 'Something went wrong'}`
+        };
+    }
+}
 
-export const deleteSpeciality = () => { };
+export async function deleteSpeciality(id: string) {
+    try {
+        const response = await serverFetch.delete(`/specialties/${id}`)
+        const result = await response.json();
+        return result;
+    } catch (error: any) {
+        console.log(error);
+        return {
+            success: false,
+            message: `${process.env.NODE_ENV === 'development' ? error.message : 'Something went wrong'}`
+        };
+    }
+}

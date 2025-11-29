@@ -58,8 +58,8 @@ function ManagementTable<T>({
                                     {col.header}
                                 </TableHead>
                             ))}
+                            {hasActions && <TableHead className="w-[70px]">Actions</TableHead>}
                         </TableRow>
-                        {hasActions && <TableHead className="w-[70px]">Actions</TableHead>}
                     </TableHeader>
                     {/* body */}
                     <TableBody>
