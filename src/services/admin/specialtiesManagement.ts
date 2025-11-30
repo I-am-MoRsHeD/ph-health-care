@@ -45,7 +45,7 @@ export async function getSpecialities() {
     try {
         const response = await serverFetch.get("/specialties")
         const result = await response.json();
-        return result;
+        return result?.data;
     } catch (error: any) {
         console.log(error);
         return {
